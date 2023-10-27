@@ -1,16 +1,44 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { getContacts } from 'components/Api.js/contacts';
+
+export const fetchContacts = createAsyncThunk(
+  'contacns/fetchAll',
+  async (_, thunkAPI) => {
+    try {
+      const contacts = await getContacts();
+
+      return contacts; 
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const addContacts = createAsyncThunk(
+  'contacns/addContact',
+  async (newContact, thunkAPI) => {
+    try {
+      const contacts = await addContact(newContact);
+
+      return contacts; 
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+
 
 const initialState = {
-  contacts: [
-    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-  ],
-  filter: '',
+  contacts: {
+    items: [],
+    isLoading: false,
+    error: null
+  },
+  filter: "",
   form: {
     name: '',
-    number: '',
+    phone: '',
   },
 };
 
@@ -18,14 +46,14 @@ export const contactSlice = createSlice({
   name: 'contacts',
   initialState,
   reducers: {
-    addContact: (state, action) => {
-      state.contacts.push(action.payload);
-    },
-    deliteContact: (state, action) => {
-      state.contacts = state.contacts.filter(
-        contact => contact.id !== action.payload
-      ); 
-    },
+    // addContact: (state, action) => {
+    //   state.contacts.items.push(action.payload);
+    // },
+    // deliteContact: (state, action) => {
+    //   state.contacts.items = state.contacts.items.filter(
+    //     contact => contact.id !== action.payload
+    //   ); 
+    // },
     filtredContact: (state, action) => {
       state.filter = action.payload;
     },
@@ -34,7 +62,38 @@ export const contactSlice = createSlice({
       state.form[fieldName] = value;
     },
   },
+
+  extraReducers: builder =>
+  builder
+    .addCase(fetchContacts.pending, state => {
+      state.contacts.isLoading = true;
+      state.contacts.error = null;
+    })
+    .addCase(fetchContacts.fulfilled, (state, action) => {
+      state.contacts.isLoading = false;
+      state.contacts.items = action.payload;
+    })
+    .addCase(fetchContacts.rejected, (state, action) => {
+      state.contacts.isLoading = false;
+      state.contacts.error = action.payload;
+    })
+
+    .addCase(addContacts.pending, state => {
+      state.contacts.isLoading = true;
+      state.contacts.error = null;
+    })
+    .addCase(addContacts.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.contacts.items.unshift(action.payload);
+    })
+    .addCase(addContacts.rejected, (state, action) => {
+      state.contacts.isLoading = false;
+      state.contacts.error = action.payload;
+    })
+    
 });
+
+
 
 export const { addContact, deliteContact, filtredContact, updateFormField } = contactSlice.actions;
 

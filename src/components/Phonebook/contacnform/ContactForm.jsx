@@ -4,13 +4,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import css from './ContactForm.module.css';
 import { nanoid } from 'nanoid';
 
-import { addContact, updateFormField } from '../../../redux/contactSlice';
+import { addContacts, updateFormField } from '../../../redux/contactSlice';
+
 
 export default function ContactForm() {
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [phone, setPhone] = useState('');
 
-  const contacts = useSelector(state => state.contacts.contacts);
+  const contacts = useSelector(state => state.contacts.contacts.items);
+  console.log("array contact", contacts);
   const dispatch = useDispatch();
 
   const handleInputChange = event => {
@@ -20,9 +22,9 @@ export default function ContactForm() {
         setName(value);
         dispatch(updateFormField({ fieldName: 'name', value: value }));
         break;
-      case 'number':
-        setNumber(value);
-        dispatch(updateFormField({ fieldName: 'number', value: value }));
+      case 'phone':
+        setPhone(value);
+        dispatch(updateFormField({ fieldName: 'phone', value: value }));
         break;
       default:
     }
@@ -31,14 +33,15 @@ export default function ContactForm() {
   const handleSubmit = event => {
     event.preventDefault();
 
-    if (name.trim() === '' || number.trim() === '') {
+    if (name.trim() === '' || phone.trim() === '') {
       alert('Please enter name and telephone number!');
       return;
     }
     const newContact = {
-      id: nanoid(),
+      createdAt: new Date().toISOString(),
       name: name,
-      number: number,
+      phone: phone,
+      id: nanoid(),
     };
 
     if (contacts.some(contact => contact.name === name)) {
@@ -46,9 +49,9 @@ export default function ContactForm() {
 
       return;
     }
-    dispatch(addContact(newContact));
+    dispatch(addContacts(newContact));
     setName('');
-    setNumber('');
+    setPhone('');
   };
 
   return (
@@ -69,8 +72,8 @@ export default function ContactForm() {
         <span className={css.inputtitle}>Number</span>
         <input
           onChange={handleInputChange}
-          name="number"
-          value={number}
+          name="phone"
+          value={phone}
           className={css.inputFormStyle}
           type="tel"
           required

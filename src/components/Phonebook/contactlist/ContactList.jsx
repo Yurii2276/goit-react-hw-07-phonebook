@@ -7,7 +7,7 @@ import { deliteContact } from '../../../redux/contactSlice';
 
 
 export default function ContactList() {
-  const contacts = useSelector(state => state.contacts.contacts);
+  const contacts = useSelector(state => state.contacts.contacts.items);
   const filter = useSelector(state => state.contacts.filter);
   const dispatch = useDispatch();
 
@@ -25,7 +25,7 @@ export default function ContactList() {
        <ul>
           {filteredContacts.map(contact => (
             <li key={contact.id} className={css.contactList}>
-              {contact.name}: {contact.number}
+              {contact.name}: {contact.phone}
               <button onClick={() => handleDeleteContact(contact.id)} className={css.btnDelete} type="click">
                 Delete
               </button>

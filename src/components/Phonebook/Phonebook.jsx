@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import css from './Phonebook.module.css';
 
@@ -6,7 +6,16 @@ import ContactForm from './contacnform/ContactForm';
 import ContactList from './contactlist/ContactList';
 import Filter from './filter/Filter';
 
+import { useDispatch } from 'react-redux';
+import { fetchContacts } from 'redux/contactSlice';
+
 export default function Phonebook() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
+
   return (
     <div>
       <div className={css.container}>
